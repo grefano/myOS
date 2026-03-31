@@ -1,0 +1,8 @@
+This project uses GRUB (GNU GRand Unified Bootloader) to create bootable ISO images.
+
+GRUB is licensed under the GNU General Public License (GPL).
+
+Source code for GRUB is available at:
+https://www.gnu.org/software/grub/
+
+This project does not modify GRUB itself; it is only used as a tool and included in the ISO image.
