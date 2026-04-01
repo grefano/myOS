@@ -1,9 +1,9 @@
 /* Declare constants for the multiboot header. */
-.set ALIGN,    1<<0             /* align loaded modules on page boundaries */
-.set MEMINFO,  1<<1             /* provide memory map */
-.set FLAGS,    ALIGN | MEMINFO  /* this is the Multiboot 'flag' field */
-.set MAGIC,    0x1BADB002       /* 'magic number' lets bootloader find the header */
-.set CHECKSUM, -(MAGIC + FLAGS) /* checksum of above, to prove we are multiboot */
+//.set ALIGN,    1<<0             /* align loaded modules on page boundaries */
+//.set MEMINFO,  1<<1             /* provide memory map */
+//.set FLAGS,    ALIGN | MEMINFO  /* this is the Multiboot 'flag' field */
+//.set MAGIC,    0x1BADB002       /* 'magic number' lets bootloader find the header */
+//.set CHECKSUM, -(MAGIC + FLAGS) /* checksum of above, to prove we are multiboot */
 
 /* 
 Declare a multiboot header that marks the program as a kernel. These are magic
@@ -13,11 +13,28 @@ search for this signature in the first 8 KiB of the kernel file, aligned at a
 forced to be within the first 8 KiB of the kernel file.
 */
 .section .multiboot
-.align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+.align 8
+multiboot2_header_start:
+  .long 0xE85250D6                  /* magic */
+  .long 0                           /* architecture: i386 */
+  .long multiboot2_header_end - multiboot2_header_start
+  .long -(0xE85250D6 + 0 + (multiboot2_header_end - multiboot2_header_start))
 
+  /* tag: framebuffer */
+  .align 8
+  .short 5                          /* type: framebuffer */
+  .short 0                          /* flags */
+  .long 20                          /* size */
+  .long 800                         /* width */
+  .long 600                         /* height */
+  .long 32                          /* depth (bits per pixel) */
+
+  /* tag: end */
+  .align 8
+  .short 0
+  .short 0
+  .long 8
+multiboot2_header_end:
 /*
 The multiboot standard does not define the value of the stack pointer register
 (esp) and it is up to the kernel to provide a stack. This allocates room for a
@@ -75,7 +92,8 @@ _start:
 	C++ features such as global constructors and exceptions will require
 	runtime support to work as well.
 	*/
-
+  push %ebx   /* ponteiro para multiboot2_info */
+  push %eax   /* magic number (deve ser 0x36d76289) */
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte
 	aligned at the time of the call instruction (which afterwards pushes

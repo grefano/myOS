@@ -59,11 +59,12 @@ size_t terminal_column;
 uint8_t terminal_color;
 uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
 
+
 void terminal_initialize(void) 
 {
 	terminal_row = 0;
 	terminal_column = 0;
-	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_DARK_GREY);
 	
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
@@ -83,7 +84,11 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
 }
-
+void terminal_jump_line() 
+{
+  terminal_column = 0;
+  terminal_row+=1;
+}
 void terminal_putchar(char c) 
 {
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
@@ -104,12 +109,48 @@ void terminal_writestring(const char* data)
 {
 	terminal_write(data, strlen(data));
 }
+struct mb2_tag {
+    uint32_t type;
+    uint32_t size;
+};
 
-void kernel_main(void) 
+struct mb2_tag_framebuffer {
+    uint32_t type;       /* 8 */
+    uint32_t size;
+    uint64_t addr;       /* endereço físico do framebuffer */
+    uint32_t pitch;      /* bytes por linha */
+    uint32_t width;
+    uint32_t height;
+    uint8_t  bpp;        /* bits por pixel */
+    uint8_t  fb_type;
+    uint16_t reserved;
+};
+void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
+    /* pula os primeiros 8 bytes (total_size + reserved) */
+    struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
+
+  while (tag->type != 0) {
+    if (tag->type == 8) { /* framebuffer */
+      struct mb2_tag_framebuffer *fb = (struct mb2_tag_framebuffer *)tag;
+      uint32_t *pixels = (uint32_t *)(uint32_t)fb->addr;
+      /* escreve um pixel vermelho na posição (0,0) */
+
+      for(unsigned int x = 0; x < 50; x++){
+
+        for(unsigned int y = 0; y < 50; y++){
+          pixels[y*800 + x] = 0x00FF0000;
+        }    
+      }
+    }
+    /* avança para a próxima tag (alinhada em 8 bytes) */
+    tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
+  }
 	/* Initialize terminal interface */
 	terminal_initialize();
 
 	/* Newline support is left as an exercise. */
 	terminal_writestring("oi resenhudos, rs teste\n");
+  terminal_jump_line();
+  terminal_writestring("outro teste\n");
 }
