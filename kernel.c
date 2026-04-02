@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 extern void gdt_init(void);
+extern void teste(void);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -149,6 +150,10 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 {
     
 gdt_init();
+
+  
+  //teste();
+  return;
   /* pula os primeiros 8 bytes (total_size + reserved) */
     struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
 

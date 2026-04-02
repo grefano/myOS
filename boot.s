@@ -86,6 +86,12 @@ reloadSegments:
   mov %ax, %ss
   ret
 
+.global teste
+teste:
+  //mov %eax, 4
+  int $0x0D
+  ret
+
 
 .global _start
 .type _start, @function
