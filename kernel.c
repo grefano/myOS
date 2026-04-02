@@ -125,6 +125,27 @@ struct mb2_tag_framebuffer {
     uint8_t  fb_type;
     uint16_t reserved;
 };
+
+uint32_t hex_lerp(uint32_t start, uint32_t end, float lerp){
+  return start + ((float)end - (float)start) * lerp;
+}
+
+void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, uint32_t col4, int xs, int ys, int w, int h){
+  xs = xs-w/2;
+  ys = ys-h/2;
+
+  uint32_t screenw = 800;
+  uint32_t screenh = 600;
+  for(int x = 0; x < w; x++){
+
+    for(int y = 0; y < h; y++){
+      int i = (y+ys) * screenw + (x+xs);
+      pixels[i] =  hex_lerp(hex_lerp(col1, col2, (float)x / (float)w), hex_lerp(col3, col4, (float)x / (float)w), (float)y / (float)h);
+    }    
+  }
+
+}
+
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
     /* pula os primeiros 8 bytes (total_size + reserved) */
@@ -135,13 +156,17 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       struct mb2_tag_framebuffer *fb = (struct mb2_tag_framebuffer *)tag;
       uint32_t *pixels = (uint32_t *)(uint32_t)fb->addr;
       /* escreve um pixel vermelho na posição (0,0) */
+      
 
-      for(unsigned int x = 0; x < 50; x++){
-
-        for(unsigned int y = 0; y < 50; y++){
-          pixels[y*800 + x] = 0x00FF0000;
-        }    
+      for(int x = 0; x < fb->width; x++){
+        for(int y = 0; y < fb->height; y++){
+          
+          int i = y * fb->width + x;
+          pixels[i] = 0x001C1c1c;
+        }
       }
+
+      draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00, fb->width/2, fb->height/2, 512, 512);
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
