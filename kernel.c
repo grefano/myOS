@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
+extern void gdt_init(void);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -11,7 +11,6 @@
 #if !defined(__i386__)
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
-
 /* Hardware text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -148,7 +147,9 @@ void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, ui
 
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
-    /* pula os primeiros 8 bytes (total_size + reserved) */
+    
+gdt_init();
+  /* pula os primeiros 8 bytes (total_size + reserved) */
     struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
 
   while (tag->type != 0) {
