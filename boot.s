@@ -53,12 +53,40 @@ stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
 
+.section .data
+gdtr:
+  .word 0   /* limit */
+  .long 0   /* base */
+
 /*
 The linker script specifies _start as the entry point to the kernel and the
 bootloader will jump to this position once the kernel has been loaded. It
 doesn't make sense to return from this function as the bootloader is gone.
 */
 .section .text
+
+.global setGdt
+setGdt:
+  mov 4(%esp), %ax
+  mov %ax, gdtr
+    mov 8(%esp), %eax
+  mov %eax, gdtr + 2
+  lgdt gdtr
+  ret
+
+.global reloadSegments
+reloadSegments:
+  ljmp $0x08, $.reload_CS
+.reload_CS:
+  mov $0x10, %ax
+  mov %ax, %ds
+  mov %ax, %es
+  mov %ax, %fs
+  mov %ax, %gs
+  mov %ax, %ss
+  ret
+
+
 .global _start
 .type _start, @function
 _start:
@@ -94,8 +122,8 @@ _start:
 	*/
   push %ebx   /* ponteiro para multiboot2_info */
   push %eax   /* magic number (deve ser 0x36d76289) */
-	/*
-	Enter the high-level kernel. The ABI requires the stack is 16-byte
+
+	/*Enter the high-level kernel. The ABI requires the stack is 16-byte
 	aligned at the time of the call instruction (which afterwards pushes
 	the return pointer of size 4 bytes). The stack was originally 16-byte
 	aligned above and we've pushed a multiple of 16 bytes to the
