@@ -57,7 +57,8 @@ stack_top:
 gdtr:
   .word 0   /* limit */
   .long 0   /* base */
-
+ldtr:
+  
 /*
 The linker script specifies _start as the entry point to the kernel and the
 bootloader will jump to this position once the kernel has been loaded. It
@@ -85,6 +86,10 @@ reloadSegments:
   mov %ax, %gs
   mov %ax, %ss
   ret
+
+.global setIdt
+setIdt:
+  lidt ldtr
 
 .global teste
 teste:
