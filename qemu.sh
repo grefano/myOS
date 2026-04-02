@@ -1,3 +1,3 @@
 set -e
 
-qemu-system-i386 -cdrom myos.iso -d int 2>&1 | head -50
+qemu-system-i386 -cdrom myos.iso -d int,cpu_reset -no-shutdown -no-reboot -D log.txt | head -50
