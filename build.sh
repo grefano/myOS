@@ -1,6 +1,7 @@
 set -ex
 
-~/opt/cross/bin/i686-elf-as boot.s -o boot.o
+#~/opt/cross/bin/i686-elf-as boot.s -o boot.o
+nasm -f elf32 boot.s -o boot.o
 
 ~/opt/cross/bin/i686-elf-gcc -c gdt.c -o gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 ~/opt/cross/bin/i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

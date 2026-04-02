@@ -21,22 +21,22 @@ struct gdt_entry {
 struct gdt_entry gdt[3];
 
 
-struct idt_ptr(){
-  uint16_t limit;
-  uint32_t base;
-} __attribute__((packed));
+//struct idt_ptr{
+//  uint16_t limit;
+//  uint32_t base;
+//} __attribute__((packed));
 
-struct idt_entry
-{
-    unsigned short base_lo;
-    unsigned short sel;        /* Our kernel segment goes here! o seg.sel da gdt q a cpu vai carregar no CS antes de chamar ISR*/
-    unsigned char always0;     /* This will ALWAYS be set to 0! */
-    unsigned char flags;       /* Set using the above table! */
-    unsigned short base_hi;
-} __attribute__((packed));
+//struct idt_entry
+//{
+//    unsigned short base_lo;
+//    unsigned short sel;        /* Our kernel segment goes here! o seg.sel da gdt q a cpu vai carregar no CS antes de chamar ISR*/
+//    unsigned char always0;     /* This will ALWAYS be set to 0! */
+//    unsigned char flags;       /* Set using the above table! */
+//    unsigned short base_hi;
+//} __attribute__((packed));
 
-struct idt_entry idt[256];
-struct idt_ptr idtp;
+//struct idt_entry idt[256];
+//struct idt_ptr idtp;
 
 void gdt_set_entry(int i, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
     gdt[i].base_low    = base & 0xFFFF;
