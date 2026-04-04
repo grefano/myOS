@@ -45,7 +45,9 @@ gdtr:
     dw 0           ; limit
     dd 0           ; base
 
-ldtr:
+idtr:
+  dw 0
+  dd 0
 
 
 ; ================================
@@ -55,10 +57,10 @@ section .text
 global setGdt
 setGdt:
     mov ax, [esp + 4]
-    mov [gdtr], ax
+    mov [gdtr], ax ; definindo limit
 
     mov eax, [esp + 8]
-    mov [gdtr + 2], eax
+    mov [gdtr + 2], eax ; definindo base
 
     lgdt [gdtr]
     ret
@@ -80,28 +82,36 @@ reload_CS:
 
 global setIdt
 setIdt:
-    lidt [ldtr]
-    ret
+  mov ax, [esp + 4]
+  mov [idtr], ax
+
+  mov eax, [esp + 8]
+  mov [idtr + 2], eax
+
+  ;movl [0xFF0000], idtr; debug
+  lidt [idtr]
+  ret
 
 
 global teste
 teste:
-    int 0x0D
-    ret
+  int 0x0D
+  ret
 
 
 global _start
 _start:
-    ; setup stack
-    mov esp, stack_top
+  ; setup stack
+  mov esp, stack_top
+  xor ebp, ebp
 
-    ; push multiboot params
-    push ebx    ; multiboot2_info
-    push eax    ; magic
+  ; push multiboot params
+  push ebx    ; multiboot2_info
+  push eax    ; magic
 
-    call kernel_main
+  call kernel_main
 
-    cli
+  cli
 hang:
-    hlt
-    jmp hang
+  hlt
+  jmp hang

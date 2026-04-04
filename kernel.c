@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 extern void gdt_init(void);
+extern void idt_init(void);
 extern void teste(void);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -146,14 +147,15 @@ void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, ui
 
 }
 
+//uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
     
-gdt_init();
-
-  
+  gdt_init();
+  idt_init();
+  //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
   //teste();
-  return;
+  //return;
   /* pula os primeiros 8 bytes (total_size + reserved) */
     struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
 
@@ -172,16 +174,10 @@ gdt_init();
         }
       }
 
-      draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00, fb->width/2, fb->height/2, 512, 512);
+      draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00, fb->width/2, fb->height/2, fb->width/2, fb->width/2);
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
-	/* Initialize terminal interface */
-	terminal_initialize();
-
-	/* Newline support is left as an exercise. */
-	terminal_writestring("oi resenhudos, rs teste\n");
-  terminal_jump_line();
-  terminal_writestring("outro teste\n");
+  
 }
