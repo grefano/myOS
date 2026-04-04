@@ -4,6 +4,7 @@
 extern void gdt_init(void);
 extern void idt_init(void);
 extern void teste(void);
+extern void PIC_remap(int,int);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -150,9 +151,12 @@ void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, ui
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
-    
+  PIC_remap(0x20, 0xA0);
   gdt_init();
   idt_init();
+
+  teste();
+  return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
   //teste();
   //return;
