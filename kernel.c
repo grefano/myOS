@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#define SSFN_CONSOLEBITMAP_TRUECOLOR
+#include "ssfn.h"
 extern void gdt_init(void);
 extern void idt_init(void);
 extern void teste(void);
@@ -132,12 +134,16 @@ uint32_t hex_lerp(uint32_t start, uint32_t end, float lerp){
   return start + ((float)end - (float)start) * lerp;
 }
 
+uint32_t screenw = 0;
+uint32_t screenh = 0;
+uint32_t* pixels = 0;
+
+
+
 void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, uint32_t col4, int xs, int ys, int w, int h){
   xs = xs-w/2;
   ys = ys-h/2;
 
-  uint32_t screenw = 800;
-  uint32_t screenh = 600;
   for(int x = 0; x < w; x++){
 
     for(int y = 0; y < h; y++){
@@ -147,7 +153,22 @@ void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, ui
   }
 
 }
+void draw_screen(){
 
+  for(int x = 0; x < screenw; x++){
+    for(int y = 0; y < screenh; y++){
+
+      int i = y * screenw + x;
+      pixels[i] = 0x001C1c1c;
+    }
+  }
+
+  draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
+}
+ssfn_font_t *ssfn_src;
+ssfn_buf_t ssfn_dst;
+
+extern unsigned char _binary_u_vga16_sfn_start[];
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
@@ -155,8 +176,9 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
   gdt_init();
   idt_init();
 
-  teste();
-  return;
+
+  //teste();
+  //return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
   //teste();
   //return;
@@ -166,22 +188,34 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
   while (tag->type != 0) {
     if (tag->type == 8) { /* framebuffer */
       struct mb2_tag_framebuffer *fb = (struct mb2_tag_framebuffer *)tag;
-      uint32_t *pixels = (uint32_t *)(uint32_t)fb->addr;
-      /* escreve um pixel vermelho na posição (0,0) */
+      pixels = (uint32_t *)(uint32_t)fb->addr;
+      screenw = fb->width;
+      screenh = fb->height;
       
 
-      for(int x = 0; x < fb->width; x++){
-        for(int y = 0; y < fb->height; y++){
-          
-          int i = y * fb->width + x;
-          pixels[i] = 0x001C1c1c;
-        }
-      }
+      ssfn_src = (ssfn_font_t*)_binary_u_vga16_sfn_start;
 
-      draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00, fb->width/2, fb->height/2, fb->width/2, fb->width/2);
+      ssfn_dst.w = fb->width;                          /* width */
+      ssfn_dst.h = fb->height;                           /* height */
+      ssfn_dst.p = fb->pitch;                          /* bytes per line */
+      ssfn_dst.x = ssfn_dst.y = 0;                /* pen position */
+      ssfn_dst.fg = 0xFFFFFF;                     /* foreground color */
+      ssfn_dst.ptr = (uint8_t*)pixels;                  /* address of the linear frame buffer */
+      ssfn_putc('H');
+      ssfn_putc('e'); 
+      ssfn_putc('l'); 
+      ssfn_putc('l'); 
+      ssfn_putc('o'); 
+       
+      //ssfn_putc('e');
+      //ssfn_putc('l');
+      //ssfn_putc('l');
+      //ssfn_putc('o');
+
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
+
   
 }

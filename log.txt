@@ -92,7 +92,6 @@ DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
 DR6=ffff0ff0 DR7=00000400
 CCS=00000044 CCD=00000000 CCO=EFLAGS
 EFER=0000000000000000
-Servicing hardware INT=0x08
 SMM: enter
 EAX=000000b5 EBX=000f7e0e ECX=00001234 EDX=00006cff
 ESI=00006cb4 EDI=06ffec55 EBP=00006c74 ESP=00006c74
@@ -169,7 +168,6 @@ DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
 DR6=ffff0ff0 DR7=00000400
 CCS=00000004 CCD=00000001 CCO=EFLAGS
 EFER=0000000000000000
-Servicing hardware INT=0x08
 SMM: enter
 EAX=000000b5 EBX=000f7e0e ECX=00001234 EDX=000069ff
 ESI=00006996 EDI=06ffec55 EBP=00006956 ESP=00006956
@@ -474,64 +472,17 @@ DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
 DR6=ffff0ff0 DR7=00000400
 CCS=00000004 CCD=00000001 CCO=EFLAGS
 EFER=0000000000000000
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x0e
-Servicing hardware INT=0x0e
 Servicing hardware INT=0x0e
 Servicing hardware INT=0x0e
 Servicing hardware INT=0x08
 Servicing hardware INT=0x0e
 Servicing hardware INT=0x0e
 Servicing hardware INT=0x08
+Servicing hardware INT=0x0e
+Servicing hardware INT=0x0e
 Servicing hardware INT=0x08
 Servicing hardware INT=0x08
 Servicing hardware INT=0x08
 Servicing hardware INT=0x08
 Servicing hardware INT=0x08
 Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-Servicing hardware INT=0x08
-     0: v=0d e=0000 i=1 cpl=0 IP=0008:0020007e pc=0020007e SP=0010:00205fe4 env->regs[R_EAX]=00200010
-EAX=00200010 EBX=00102578 ECX=00000000 EDX=00000020
-ESI=00000000 EDI=00000000 EBP=00205ff0 ESP=00205fe4
-EIP=0020007e EFL=00200002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-CS =0008 00000000 ffffffff 00cf9a00 DPL=0 CS32 [-R-]
-SS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-DS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-FS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-GS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
-TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
-GDT=     00206020 00000017
-IDT=     00206040 000007ff
-CR0=00000011 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000 
-DR6=ffff0ff0 DR7=00000400
-CCS=00000000 CCD=00205fc8 CCO=EFLAGS
-EFER=0000000000000000
