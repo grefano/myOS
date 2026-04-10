@@ -1,7 +1,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#define SSFN_CONSOLEBITMAP_TRUECOLOR
+
+#include "libc.h"
+#include "string.h"
+#define SSFN_IMPLEMENTATION
 #include "ssfn.h"
 extern void gdt_init(void);
 extern void idt_init(void);
@@ -165,9 +168,19 @@ void draw_screen(){
 
   draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
 }
+
+
+
+void draw_text(const char* text, int size, int x, int y){
+  ssfn_dst.x = x;
+  ssfn_dst.y = y;
+  for(int i = 0; i < size; i++){
+    ssfn_putc(text[i]);
+  }
+}
 ssfn_font_t *ssfn_src;
 ssfn_buf_t ssfn_dst;
-
+ssfn_t ssfn_ctx = {0};
 extern unsigned char _binary_u_vga16_sfn_start[];
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
@@ -176,6 +189,7 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
   gdt_init();
   idt_init();
 
+  ssfn_load(&ssfn_ctx, &_binary_u_vga16_sfn_start);
 
   //teste();
   //return;
@@ -198,24 +212,16 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       ssfn_dst.w = fb->width;                          /* width */
       ssfn_dst.h = fb->height;                           /* height */
       ssfn_dst.p = fb->pitch;                          /* bytes per line */
-      ssfn_dst.x = ssfn_dst.y = 0;                /* pen position */
-      ssfn_dst.fg = 0xFFFFFF;                     /* foreground color */
+      ssfn_dst.x = ssfn_dst.y =100;                /* pen position */
+      ssfn_dst.fg = 0x22AA22;                     /* foreground color */
       ssfn_dst.ptr = (uint8_t*)pixels;                  /* address of the linear frame buffer */
-      ssfn_putc('H');
-      ssfn_putc('e'); 
-      ssfn_putc('l'); 
-      ssfn_putc('l'); 
-      ssfn_putc('o'); 
-       
-      //ssfn_putc('e');
-      //ssfn_putc('l');
-      //ssfn_putc('l');
-      //ssfn_putc('o');
-
+     ssfn_dst.bg = 0x3B3733; 
+      //draw_text("hello", 5, 200, 300);
+      ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
-
+  ssfn_free(&ssfn_ctx);
   
 }
