@@ -19,3 +19,11 @@ void* memset(void* s, int c, size_t n){
     _s[n] = c;
   }
 }
+
+void memcpy(void* s1, void* s2, size_t n){
+  unsigned char* _s1 = (unsigned char*) s1;
+  unsigned char* _s2 = (unsigned char*) s2;
+  for(size_t i = 0; i < n; i++){
+    _s2[i] = _s1[i];
+  }
+}
