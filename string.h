@@ -14,16 +14,17 @@ int memcmp(const void* s1, const void* s2, size_t n){
 
 //void* memset(void* s, int c, size_t n);
 void* memset(void* s, int c, size_t n){
-  int* _s = (int*) s;
+  unsigned char * _s = (unsigned char*) s;
   for(size_t i = 0; i < n; i++){
-    _s[n] = c;
+    _s[n] = (unsigned char)c;
   }
+  return s;
 }
 
-void memcpy(void* s1, void* s2, size_t n){
-  unsigned char* _s1 = (unsigned char*) s1;
-  unsigned char* _s2 = (unsigned char*) s2;
+void memcpy(void* dst, void* src, size_t n){
+  unsigned char* _dst = (unsigned char*) dst;
+  const unsigned char* _src = ( const unsigned char*) src;
   for(size_t i = 0; i < n; i++){
-    _s2[i] = _s1[i];
+    _dst[i] = _src[i];
   }
 }
