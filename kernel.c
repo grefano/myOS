@@ -200,10 +200,10 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 
 
   
-  ssfn_load(&ssfn_ctx, &_binary_lanapixel_sfn_start);
-  int r = ssfn_select(&ssfn_ctx, SSFN_FAMILY_SERIF, NULL, SSFN_STYLE_REGULAR, 64);
+  ssfn_load(&ssfn_ctx, (ssfn_font_t*)_binary_lanapixel_sfn_start);
+  int r = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, SSFN_STYLE_REGULAR, 64);
   if (r != 0) {return;}
-  //teste();
+  //teste();n
   //return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
   //teste();
