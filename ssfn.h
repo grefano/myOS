@@ -1248,10 +1248,10 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
             bR = (dst->bg >> 16) & 0xFF; bG = (dst->bg >> 8) & 0xFF; bB = (dst->bg >> 0) & 0xFF; O = 0xFF000000;
             Op = (uint32_t*)(dst->ptr + dst->p * (dst->y - oy) + ((dst->x - ox) << 2));
             for (y = 0; y < h && dst->y + y - oy < dst->h; y++, Op += dst->p >> 2) {
-                if(dst->y + y - oy < 0) continue;
+                if(dst->y + y - oy < 0) continue; // desenha linha
                 y0 = (y << 8) * ctx->g->h / h; Y0 = y0 >> 8; y1 = ((y + 1) << 8) * ctx->g->h / h; Y1 = y1 >> 8; Ol = Op;
                 for (x = 0; x < w && dst->x + x - ox < j; x++, Ol++) {
-                    if(dst->x + x - ox < 0) continue;
+                    if(dst->x + x - ox < 0) continue; // desenha coluna
                     m = 0; sR = sG = sB = sA = bA = 0;
                     if(!dst->bg) {
                         /* real linear frame buffers should be accessed only as uint32_t on 32 bit boundary */
