@@ -4,6 +4,7 @@
 
 #include "libc.h"
 #include "string.h"
+#define SSFN_MAXLINES 64
 #define SSFN_IMPLEMENTATION
 #include "ssfn.h"
 extern void gdt_init(void);
@@ -23,7 +24,7 @@ extern uint32_t end;
 uint32_t heap_start;
 uint32_t heap_end;
 void init_heap(){
-   heap_start = (uint32_t)&end; 
+   heap_start = ((uint32_t)&end + 3) & -3;; 
   heap_end = heap_start;
 }
 /* Hardware text mode color constants. */
@@ -201,7 +202,7 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 
   
   ssfn_load(&ssfn_ctx, (ssfn_font_t*)_binary_lanapixel_sfn_start);
-  int r = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, SSFN_STYLE_REGULAR, 64);
+  int r = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, SSFN_STYLE_REGULAR, 52);
   if (r != 0) {return;}
   //teste();n
   //return;
@@ -227,13 +228,13 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       ssfn_dst.h = fb->height;                           /* height */
       ssfn_dst.p = fb->pitch;                          /* bytes per line */
       ssfn_dst.x = ssfn_dst.y =100;                /* pen position */
-      ssfn_dst.fg = 0xFFFFFFFF;                     /* foreground color */
+      ssfn_dst.fg = 0xFFffffff;                     /* foreground color */
 
       ssfn_dst.ptr = (uint8_t*)pixels;
-      ssfn_dst.bg = 0;/* address of the linear frame buffer */
+      ssfn_dst.bg = 0xFF000000;/* address of the linear frame buffer */
       //draw_text("hello", 5, 200, 300);
       //ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
-const char *str = "hello";
+const char *str = "Hello";
 while(*str) {
     int r = ssfn_render(&ssfn_ctx, &ssfn_dst, str);
     if(r < 0) break;

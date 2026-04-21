@@ -10,7 +10,8 @@ extern uint32_t heap_start;
 extern uint32_t heap_end;
 
 block_t* find_free_block(size_t size){
-  block_t* current = (block_t*)heap_start - 1;
+  if (heap_start == heap_end) return NULL;
+  block_t* current = (block_t*)heap_start ;
   while(current){
     if(current->free && current->size >= size){
       return current;
@@ -20,6 +21,7 @@ block_t* find_free_block(size_t size){
   return NULL;
 }
 block_t* request_space(size_t size){
+  heap_end = (heap_end + 3) & -3;
   block_t* block = (block_t*)heap_end;
     block->size = size;
     block->free = 0;
