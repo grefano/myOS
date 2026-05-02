@@ -21,7 +21,7 @@ block_t* find_free_block(size_t size){
   return NULL;
 }
 block_t* request_space(size_t size){
-  heap_end = (heap_end + 3) & -3;
+  heap_end = heap_end;//(heap_end + 3) & -3;
   block_t* block = (block_t*)heap_end;
     block->size = size;
     block->free = 0;
