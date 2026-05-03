@@ -9,6 +9,7 @@
 #include "ssfn.h"
 #include "./drivers/draw.h"
 #include "./drivers/cursor.h"
+#include "./drivers/window.h"
 extern void gdt_init(void);
 extern void idt_init(void);
 extern void teste(void);
@@ -94,9 +95,6 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       screenw = fb->width;
       screenh = fb->height;
       
-      pixels[0] = 0x00FFFFFF;
-      pixels[1] = 0x00FFFFFF;
-
 
  draw_start(screenw, screenh, fb->pitch, pixels); 
       //draw_text("hello", 5, 200, 300);
@@ -106,6 +104,8 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 
       draw_text("tem coisa q tlgd", 20, 300, 300, 0xFFFFFFFF);
       draw_text("tem outras q tbm é foda", 10, 50, 400, 0xFFFF00FF);
+      struct Window window = window_create(fb, 50, 50);
+      window_draw(&window);
       cursor_start(fb);
       cursor_draw();
     }
