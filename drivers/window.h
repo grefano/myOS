@@ -13,6 +13,9 @@ vec2 window_surface_default(struct Window* window, vec2 pos){
   return pos;
 }
 vec2 window_surface_example1(struct Window* window, vec2 pos){
+  float p = 80.0f;
+  float add = (sin((float)pos.x*2.0*PI/p))*10;
+  pos.x += add; 
   return pos;
 }
 
@@ -42,33 +45,27 @@ void window_free(struct Window* window){
   free(window);
 }
 uint32_t get_grid_color(uint32_t colors[], int qtd_colors, int grid_size, vec2 pos){
-  vec2 m;
-  m.x = pos.x % (grid_size*qtd_colors); // 0-60
-  m.y = pos.y % (grid_size*qtd_colors);
-
   vec2 l;
-  l.x = m.x / grid_size;
-  l.y = m.y / grid_size;
+  l.x = pos.x % (grid_size*qtd_colors) / grid_size;
+  l.y = pos.y % (grid_size*qtd_colors) / grid_size;
 
   return colors[(l.x + l.y) % qtd_colors];
-/*
-  vec2 i;
-  for(int c = 0; c < qtd_colors; c++){
-    i.x = m.x < grid_size ? colors[c];
-    i.y = m.y < grid_size ? 1 : 0;
-  }
-  return i.x != i.y ? 0xFFCCCCCC : 0xFFAAAABB;
-  */
+}
+uint32_t get_fade_color(uint32_t colors[], int qtd_colors, vec2 pos){
+  if (qtd_colors < 2) return 0xFFFFFFFF;
+  float l = (float)pos.x / 100.0f;
+  if (l > 1) l = 1;
+  if (l < 0) l = 0;
+  uint32_t c =colors[0] +(float)(colors[1]-colors[0]) * l; 
+  
+  return c;
 }
 uint32_t window_get_pixel_color(vec2 pos){
-  //int q = x % 40;
-  //int k = y % 40;
-  //int xx = q > 20 ? 1 : 0;
-  //int yy = k > 20 ? 1 : 0;
 
-  //return xx != yy ? 0xFFCCCCCC : 0xFFAAAABB;
-  uint32_t colors[3] = {0xFFCCCCCC, 0xFFAAAAAC, 0xFFBBCCBB};
-  return get_grid_color(colors, 3, 20, pos);
+
+  uint32_t colors[3] = {0xFFFF00BB, 0xFFFF00FF};// {0xFFCCCCCC, 0xFFAAAAAC, 0xFFBBCCBB};
+  return get_fade_color(colors, 3, pos);
+  //return get_grid_color(colors, 3, 20, pos);
 }
 void window_draw_buffer(struct Window* window){
   for(int x = 0; x < window->w; x++){

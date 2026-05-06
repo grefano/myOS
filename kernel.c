@@ -10,6 +10,7 @@
 #include "./drivers/draw.h"
 #include "./drivers/cursor.h"
 #include "./drivers/window.h"
+#include "./drivers/input.h"
 extern void gdt_init(void);
 extern void idt_init(void);
 extern void teste(void);
@@ -69,7 +70,6 @@ void draw_screen(){
   draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
 }
 
-
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
@@ -79,14 +79,14 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
   idt_init();
  init_heap();
 
-
+  init_ps2();
   //teste();n
   //return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
   //teste();
   //return;
   /* pula os primeiros 8 bytes (total_size + reserved) */
-    struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
+  struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
 
   while (tag->type != 0) {
     if (tag->type == 8) { /* framebuffer */
@@ -94,9 +94,9 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       pixels = (uint32_t *)(uint32_t)fb->addr;
       screenw = fb->width;
       screenh = fb->height;
-      
 
- draw_start(screenw, screenh, fb->pitch, pixels); 
+
+      draw_start(screenw, screenh, fb->pitch, pixels); 
       //draw_text("hello", 5, 200, 300);
       //ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
       
@@ -105,6 +105,7 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
       draw_text("tem coisa q tlgd", 20, 300, 300, 0xFFFFFFFF);
       draw_text("tem outras q tbm é foda", 10, 50, 400, 0xFFFF00FF);
       struct Window window = window_create(fb, 50, 50);
+      window.get_pos_surface = window_surface_example1;
       window_draw(&window);
       cursor_start(fb);
       cursor_draw();
