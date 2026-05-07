@@ -79,7 +79,7 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
   idt_init();
  init_heap();
 
-  init_ps2();
+  //init_ps2();
   //teste();n
   //return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
@@ -114,5 +114,4 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
   ssfn_free(&ssfn_ctx);
-  
 }
