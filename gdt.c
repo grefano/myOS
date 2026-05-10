@@ -68,12 +68,27 @@ void gdt_init() {
 void idt_init(){
 
 
-  for (uint8_t vector = 0; vector < 32; vector++) {
+  for (uint8_t vector = 0; vector < 48; vector++) {
     idt_set_entry(vector, (uint32_t)isr_stub_table[vector], 0x8E);
   }
   
   setIdt(sizeof(idt) - 1, (uint32_t)idt);
   reloadSegments();
+  __asm__ volatile ("sti");
 //  __asm__ volatile ("mov [0xFF0000], $6");
 }
 
+void pit_init(){
+    __asm__ volatile(
+        "mov $1193, %%dx;"
+        "mov $0b110110, %%al;"
+        "out %%al, $0x43;"
+        "mov %%dx, %%ax;"
+        "out %%al, $0x40;"
+        "xchg %%al, %%ah;"
+        "out %%al, $0x40;"
+        :
+        :
+        : "%ax", "%dx", "%al"
+    );
+}

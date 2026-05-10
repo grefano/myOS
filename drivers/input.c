@@ -15,7 +15,7 @@ void init_ps2(){
   io_wait();
   uint8_t config_byte = inb(PORT_DATA);
   io_wait();
-  config_byte &= 0b01010101;
+  config_byte |= 0b00000001;
   outb(REG_CMD, 0x60);
   io_wait();
   outb(PORT_DATA, config_byte);
@@ -39,9 +39,11 @@ void init_ps2(){
   io_wait();
 
   // reset device of port 1
-  outb(REG_CMD, 0xFF);
+  outb(PORT_DATA, 0xFF);
   io_wait();
   if (inb(PORT_DATA) != 0xFA) return;
   io_wait();
+
+
 
 }

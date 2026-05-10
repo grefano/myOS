@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "./drivers/vga.h"
 #include "libc.h"
 #include "string.h"
 #define SSFN_MAXLINES 32
@@ -13,8 +14,11 @@
 #include "./drivers/input.h"
 extern void gdt_init(void);
 extern void idt_init(void);
+extern void pit_init(void);
 extern void teste(void);
 extern void PIC_remap(int,int);
+extern void terminal_init();
+extern void terminal_writestring(const char*);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -69,17 +73,24 @@ void draw_screen(){
 
   draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
 }
-
+void log(const char* txt){
+  static int y = 500;
+  int x = 200;
+  draw_text("testando log", 10, x, y, 0xFFFFFFFF);
+  y += 20;
+}
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
 
-  PIC_remap(0x20, 0xA0);
   gdt_init();
+  PIC_remap(0x20, 0xA0);
   idt_init();
- init_heap();
-
-  //init_ps2();
+  pit_init();
+  //terminal_init();
+  init_heap();
+  //terminal_writestring("teste");
+  init_ps2();
   //teste();n
   //return;
   //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
@@ -114,4 +125,5 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
   ssfn_free(&ssfn_ctx);
+ // int a = 1 / 0; 
 }

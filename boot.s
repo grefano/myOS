@@ -11,21 +11,20 @@ multiboot2_header_start:
     dd -(0xE85250D6 + 0 + (multiboot2_header_end - multiboot2_header_start))
 
     ; tag: framebuffer
-    align 8
-    dw 5                           ; type
-    dw 0                           ; flags
-    dd 20                          ; size
-    dd 800                         ; width
-    dd 600                         ; height
-    dd 32                          ; depth
-
+  align 8
+  dw 5                           ; type
+  dw 0                           ; flags
+  dd 20                          ; size
+  dd 800                         ; width
+  dd 600                         ; height
+  dd 32                          ; depth
+    
     ; tag: end
     align 8
     dw 0
     dw 0
     dd 8
 multiboot2_header_end:
-
 
 ; ================================
 ; STACK (BSS)
@@ -63,6 +62,7 @@ setGdt:
     mov [gdtr + 2], eax ; definindo base
 
     lgdt [gdtr]
+
     ret
 
 
@@ -91,7 +91,6 @@ setIdt:
   ;movl [0xFF0000], idtr; debug
   lidt [idtr]
   ret
-
 
 global teste
 teste:

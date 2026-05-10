@@ -6,4 +6,4 @@
 #define PORT_DATA 0x60
 #define REG_STATUS 0x64
 
-void init_ps2(); 
+void init_ps2();
