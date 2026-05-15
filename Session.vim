@@ -10,17 +10,24 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess+=aoO
-badd +11 kernel.c
-badd +1 boot.s
-badd +9 macros.s
+badd +123 kernel.c
+badd +83 boot.s
 badd +1 drivers/input.c
-badd +1 excepthandler.c
+badd +10 excepthandler.c
+badd +7 process.c
+badd +1 drivers/scheduler.c
+badd +9 swtch.s
+badd +17 build.sh
+badd +4 libc.h
+badd +8 libc.c
+badd +2 string.h
+badd +1 string.c
 argglobal
 %argdel
 $argadd kernel.c
 $argadd boot.s
 $argadd macros.s
-edit kernel.c
+edit swtch.s
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -29,21 +36,25 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-balt excepthandler.c
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.LazyVim.treesitter.foldexpr()
+if bufexists(fnamemodify("swtch.s", ":p")) | buffer swtch.s | else | edit swtch.s | endif
+if &buftype ==# 'terminal'
+  silent file swtch.s
+endif
+balt kernel.c
+setlocal foldmethod=indent
+setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
 setlocal foldignore=#
 setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 11 - ((10 * winheight(0) + 24) / 48)
+let s:l = 9 - ((8 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 11
-normal! 024|
+keepjumps 9
+normal! 0
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

@@ -4,6 +4,7 @@
 
 #include "./drivers/vga.h"
 #include "libc.h"
+#include "proc.h"
 #include "string.h"
 #define SSFN_MAXLINES 32
 #define SSFN_IMPLEMENTATION
@@ -19,6 +20,9 @@ extern void teste(void);
 extern void PIC_remap(int,int);
 extern void terminal_init();
 extern void terminal_writestring(const char*);
+extern void sched();
+extern struct Context* task_create(void(*start)());
+extern void swtch(struct Context**, struct Context*);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -74,11 +78,30 @@ void draw_screen(){
   draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
 }
 void log(const char* txt){
-  static int y = 500;
-  int x = 200;
-  draw_text("testando log", 10, x, y, 0xFFFFFFFF);
-  y += 20;
+  static int y = 400;
+  static int x = 100;
+  draw_text(txt, 25, x, y, 0xFFFFFFFF);
+  x += 50;
+  //x += 40;
+
 }
+
+void teste_task1(){
+  int a = 67;
+  //schedule();
+  //swtch(&myctx, task2);
+  sched();
+  int b = 68;
+}
+void teste_task2(){
+  int c = 69;
+  //schedule();
+  //swtch(&myctx, task1);
+  sched();
+  int d = 70;
+}
+struct Context* task1;
+struct Context* task2;
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
@@ -124,6 +147,20 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
+
+struct Context ktask;
+struct Context* kctx = &ktask;
+
+task1 = task_create(teste_task1);
+  task2 = task_create(teste_task2);
+//struct Context* task2; = task_create(teste_task2);
+  swtch(&kctx, task1);
+  
+
+  // int a = 1 / 0; 
+  while(true){
+// **
+    1==1;
+  }
   ssfn_free(&ssfn_ctx);
- // int a = 1 / 0; 
 }

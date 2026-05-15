@@ -6,10 +6,24 @@ void exception_handler(){
   //__asm__ volatile ("cli; hlt");
 }
 
+char keyboard_scancode_to_char(uint8_t code){
+  if (code == 0x1E){
+    return 'a';
+  }
+  if (code == 0x1F){
+    return 's';
+  }
+  return '-';
+}
 
 void handler_keyboard(){
   io_wait();
   uint8_t scancode = inb(PORT_DATA);
+  const char c = keyboard_scancode_to_char(scancode);
+  char s[2];
+  s[0] = c;
+  s[1] = '\0';
+  log(s);
   outb(0x20, 0x20);
 }
 void handler_mouse(){
