@@ -23,6 +23,7 @@ extern void terminal_writestring(const char*);
 extern void sched();
 extern struct Context* task_create(void(*start)());
 extern void swtch(struct Context**, struct Context*);
+extern struct Proc* proc_create(void(*start)());
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -46,9 +47,12 @@ uint32_t hex_lerp(uint32_t start, uint32_t end, float lerp){
   return start + ((float)end - (float)start) * lerp;
 }
 
+struct mb2_tag_framebuffer* fb;
 uint32_t screenw = 0;
 uint32_t screenh = 0;
 uint32_t* pixels = 0;
+int pitch = 0;
+
 
 
 
@@ -67,15 +71,19 @@ void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, ui
 }
 void draw_screen(){
 
-  for(int x = 0; x < screenw; x++){
-    for(int y = 0; y < screenh; y++){
+  //draw_text("hello", 5, 200, 300);
+  //ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
 
-      int i = y * screenw + x;
-      pixels[i] = 0x001C1c1c;
-    }
-  }
 
-  draw_rect(pixels, 0x00FF0000, 0x00FFFF00, 0x000000FF, 0x0000FF00,  screenw/2, screenh/2, screenw/2, screenw/2);
+
+  draw_text("tem coisa q tlgd", 20, 300, 300, 0xFFFFFFFF);
+  draw_text("tem outras q tbm é foda", 10, 50, 400, 0xFFFF00FF);
+  struct Window window = window_create(fb, 50, 50);
+  window.get_pos_surface = window_surface_example1;
+  window_draw(&window);
+  cursor_start(fb);
+  cursor_draw();
+
 }
 void log(const char* txt){
   static int y = 400;
@@ -86,6 +94,7 @@ void log(const char* txt){
 
 }
 //extern struct Context* myctx;
+struct Context* ctxDrawScreen;
 struct Context* ctxSched;
 struct Context* task1;
 struct Context* task2;
@@ -104,6 +113,11 @@ void teste_task2(){
   swtch(&task2, ctxSched);
   int d = 70;
 }
+void kernel_end(){
+
+  ssfn_free(&ssfn_ctx);
+}
+
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
@@ -126,44 +140,30 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 
   while (tag->type != 0) {
     if (tag->type == 8) { /* framebuffer */
-      struct mb2_tag_framebuffer *fb = (struct mb2_tag_framebuffer *)tag;
+      fb = (struct mb2_tag_framebuffer *)tag;
       pixels = (uint32_t *)(uint32_t)fb->addr;
       screenw = fb->width;
       screenh = fb->height;
-
-
-      draw_start(screenw, screenh, fb->pitch, pixels); 
-      //draw_text("hello", 5, 200, 300);
-      //ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
-      
-
-
-      draw_text("tem coisa q tlgd", 20, 300, 300, 0xFFFFFFFF);
-      draw_text("tem outras q tbm é foda", 10, 50, 400, 0xFFFF00FF);
-      struct Window window = window_create(fb, 50, 50);
-      window.get_pos_surface = window_surface_example1;
-      window_draw(&window);
-      cursor_start(fb);
-      cursor_draw();
+      pitch = fb->pitch;
+  draw_start(screenw, screenh, pitch, pixels); 
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
+  draw_screen();
+  struct Context ktask;
+  struct Context* kctx = &ktask;
 
-struct Context ktask;
-struct Context* kctx = &ktask;
-
+  proc_create(draw_screen);
+  proc_create(sched);
+  proc_create(teste_task1);
+  proc_create(teste_task2);
+  //ctxDrawScreen = task_create(draw_screen);
   ctxSched = task_create(sched);
-task1 = task_create(teste_task1);
-  task2 = task_create(teste_task2);
-//struct Context* task2; = task_create(teste_task2);
-  swtch(&kctx, ctxSched);
-  
+  //task1 = task_create(teste_task1);
+  //task2 = task_create(teste_task2);
 
-  // int a = 1 / 0; 
-  while(true){
-// **
-    1==1;
-  }
-  ssfn_free(&ssfn_ctx);
+  swtch(&kctx, ctxSched);
+
+
 }
