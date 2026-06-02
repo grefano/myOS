@@ -36,18 +36,22 @@ extern void teste_task2();
 extern struct Context* task1;
 extern struct Context* task2;
 
-struct Context* myctx = 0;
-static int a = 0;
-void sched(){
-  
-  if (a++ == 0){
+extern struct Context* ctxSched;
 
-    swtch(&myctx, task2);
+//struct Context* myctx = 0;
+static int a = 0;
+void sched(){ 
+  if (a == 0){
+    a++;
+    swtch(&ctxSched, task2);
   }
-  if (a++ == 1){
-    swtch(&myctx, task1);
+  if (a == 1){
+    a++;
+    swtch(&ctxSched, task1);
   }
-  if (a++ == 2){
-    swtch(&myctx, task2);
+  if (a == 2){
+    a++;
+    swtch(&ctxSched, task2);
   }
 }
+

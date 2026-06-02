@@ -85,23 +85,25 @@ void log(const char* txt){
   //x += 40;
 
 }
-
+//extern struct Context* myctx;
+struct Context* ctxSched;
+struct Context* task1;
+struct Context* task2;
 void teste_task1(){
   int a = 67;
   //schedule();
-  //swtch(&myctx, task2);
-  sched();
+  swtch(&task1, ctxSched);
+  //sched();
   int b = 68;
 }
 void teste_task2(){
   int c = 69;
   //schedule();
   //swtch(&myctx, task1);
-  sched();
+  //sched();
+  swtch(&task2, ctxSched);
   int d = 70;
 }
-struct Context* task1;
-struct Context* task2;
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
@@ -151,10 +153,11 @@ void kernel_main(unsigned int magic, unsigned int* mb_info)
 struct Context ktask;
 struct Context* kctx = &ktask;
 
+  ctxSched = task_create(sched);
 task1 = task_create(teste_task1);
   task2 = task_create(teste_task2);
 //struct Context* task2; = task_create(teste_task2);
-  swtch(&kctx, task1);
+  swtch(&kctx, ctxSched);
   
 
   // int a = 1 / 0; 
