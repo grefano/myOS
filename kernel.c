@@ -13,6 +13,7 @@
 #include "./drivers/cursor.h"
 #include "./drivers/window.h"
 #include "./drivers/input.h"
+#include "./drivers/gui.h"
 extern void gdt_init(void);
 extern void idt_init(void);
 extern void pit_init(void);
@@ -24,6 +25,7 @@ extern void sched();
 extern struct Context* task_create(void(*start)());
 extern void swtch(struct Context**, struct Context*);
 extern struct Proc* proc_create(void(*start)());
+extern void draw_rect(struct pixelbuffer* fb, uint32_t col1, uint32_t col2, uint32_t col3, uint32_t col4, int xs, int ys, int w, int h);
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -43,11 +45,8 @@ void init_heap(){
 
 
 
-uint32_t hex_lerp(uint32_t start, uint32_t end, float lerp){
-  return start + ((float)end - (float)start) * lerp;
-}
 
-struct mb2_tag_framebuffer* fb;
+struct pixelbuffer* pb;
 uint32_t screenw = 0;
 uint32_t screenh = 0;
 uint32_t* pixels = 0;
@@ -55,36 +54,6 @@ int pitch = 0;
 
 
 
-
-void draw_rect(uint32_t* pixels, uint32_t col1, uint32_t col2, uint32_t col3, uint32_t col4, int xs, int ys, int w, int h){
-  xs = xs-w/2;
-  ys = ys-h/2;
-
-  for(int x = 0; x < w; x++){
-
-    for(int y = 0; y < h; y++){
-      int i = (y+ys) * screenw + (x+xs);
-      pixels[i] =  hex_lerp(hex_lerp(col1, col2, (float)x / (float)w), hex_lerp(col3, col4, (float)x / (float)w), (float)y / (float)h);
-    }    
-  }
-
-}
-void draw_screen(){
-
-  //draw_text("hello", 5, 200, 300);
-  //ssfn_render(&ssfn_ctx, &ssfn_dst, "hellp");
-
-
-
-  draw_text("tem coisa q tlgd", 20, 300, 300, 0xFFFFFFFF);
-  draw_text("tem outras q tbm é foda", 10, 50, 400, 0xFFFF00FF);
-  struct Window window = window_create(fb, 50, 50);
-  window.get_pos_surface = window_surface_example1;
-  window_draw(&window);
-  cursor_start(fb);
-  cursor_draw();
-
-}
 void log(const char* txt){
   static int y = 400;
   static int x = 100;
@@ -114,43 +83,33 @@ void teste_task2(){
   int d = 70;
 }
 void kernel_end(){
-
   ssfn_free(&ssfn_ctx);
 }
 
 //uint32_t teste = 6;
 void kernel_main(unsigned int magic, unsigned int* mb_info) 
 {
-
   gdt_init();
   PIC_remap(0x20, 0xA0);
   idt_init();
   pit_init();
-  //terminal_init();
   init_heap();
-  //terminal_writestring("teste");
   init_ps2();
-  //teste();n
-  //return;
-  //__asm__ volatile ("movl $6, %0)" : "=r"(teste)  );
-  //teste();
-  //return;
-  /* pula os primeiros 8 bytes (total_size + reserved) */
   struct mb2_tag *tag = (struct mb2_tag *)((uint8_t *)mb_info + 8);
 
   while (tag->type != 0) {
     if (tag->type == 8) { /* framebuffer */
-      fb = (struct mb2_tag_framebuffer *)tag;
-      pixels = (uint32_t *)(uint32_t)fb->addr;
-      screenw = fb->width;
-      screenh = fb->height;
-      pitch = fb->pitch;
-  draw_start(screenw, screenh, pitch, pixels); 
+      struct mb2_tag_framebuffer* fb = (struct mb2_tag_framebuffer *)tag;
+      pb->addr = (uint32_t *)(uint32_t)fb->addr;
+      pb->width = fb->width;
+      pb->height = fb->height;
+      pb->pitch = fb->pitch;
+  draw_start(pb); 
     }
     /* avança para a próxima tag (alinhada em 8 bytes) */
     tag = (struct mb2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7));
   }
-  draw_screen();
+  draw_screen(pb);
   struct Context ktask;
   struct Context* kctx = &ktask;
 

@@ -92,6 +92,16 @@ setIdt:
   lidt [idtr]
   ret
 
+
+enableMMU:
+  mov cr3, esi ; esi deve conter endereço fisico da tabela de paginas
+  
+  mov eax, cr0
+  or eax, 0x80000001 ; set bit 31 (PG) e o bit 0 (PE)
+  mov cr0, eax ; ativar mmu
+
+  ret
+
 global teste
 teste:
   int 0x0D
@@ -107,6 +117,8 @@ _start:
   ; push multiboot params
   push ebx    ; multiboot2_info
   push eax    ; magic
+
+  call enableMMU
 
   call kernel_main
 

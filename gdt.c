@@ -92,3 +92,4 @@ void pit_init(){
         : "%ax", "%dx", "%al"
     );
 }
+

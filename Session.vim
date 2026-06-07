@@ -10,24 +10,21 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess+=aoO
-badd +123 kernel.c
-badd +83 boot.s
-badd +1 drivers/input.c
-badd +10 excepthandler.c
+badd +133 kernel.c
+badd +101 boot.s
+badd +38 excepthandler.c
 badd +7 process.c
 badd +1 drivers/scheduler.c
-badd +9 swtch.s
 badd +17 build.sh
-badd +4 libc.h
-badd +8 libc.c
-badd +2 string.h
-badd +1 string.c
+badd +21 macros.s
+badd +32 linker.ld
+badd +6 gdt.c
 argglobal
 %argdel
 $argadd kernel.c
 $argadd boot.s
 $argadd macros.s
-edit swtch.s
+edit gdt.c
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -36,25 +33,25 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-if bufexists(fnamemodify("swtch.s", ":p")) | buffer swtch.s | else | edit swtch.s | endif
+if bufexists(fnamemodify("gdt.c", ":p")) | buffer gdt.c | else | edit gdt.c | endif
 if &buftype ==# 'terminal'
-  silent file swtch.s
+  silent file gdt.c
 endif
 balt kernel.c
-setlocal foldmethod=indent
-setlocal foldexpr=0
+setlocal foldmethod=expr
+setlocal foldexpr=v:lua.LazyVim.treesitter.foldexpr()
 setlocal foldmarker={{{,}}}
 setlocal foldignore=#
 setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 9 - ((8 * winheight(0) + 24) / 49)
+let s:l = 6 - ((5 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 9
-normal! 0
+keepjumps 6
+normal! 023|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

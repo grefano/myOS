@@ -4,11 +4,11 @@
 struct Cursor{
   int x;
   int y;
-  struct mb2_tag_framebuffer* fb;
+  struct pixelbuffer* fb;
 };
 struct Cursor cursor = {50, 50, 0};
 
-void cursor_start(struct mb2_tag_framebuffer* fb){
+void cursor_start(struct pixelbuffer* fb){
   cursor.fb = fb;
 }
 void cursor_draw(){

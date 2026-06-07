@@ -2,11 +2,34 @@
 #include "../libc.h"
 #include "./draw.h"
 #include "../math.h"
+
+struct mb2_tag {
+    uint32_t type;
+    uint32_t size;
+};
+struct mb2_tag_framebuffer {
+    uint32_t type;       
+    uint32_t size;
+    uint64_t addr;     
+    uint32_t pitch;      
+    uint32_t width;
+    uint32_t height;
+    uint8_t  bpp;        
+    uint8_t  fb_type;
+    uint16_t reserved;
+};
+struct pixelbuffer{
+  
+    uint32_t* addr;       /* endereço físico do framebuffer */
+    uint32_t pitch;      /* bytes por linha */
+    uint32_t width;
+    uint32_t height;
+};
 struct Window{
   int x, y;
   int h, w;
   vec2 (*get_pos_surface)(struct Window* window, vec2 pos);
-  struct mb2_tag_framebuffer* fb;
+  struct pixelbuffer* fb;
 
 };
 vec2 window_surface_default(struct Window* window, vec2 pos){
@@ -19,7 +42,7 @@ vec2 window_surface_example1(struct Window* window, vec2 pos){
   return pos;
 }
 
-struct Window* window_alloc(struct mb2_tag_framebuffer* fb, int x, int y){
+struct Window* window_alloc(struct pixelbuffer* fb, int x, int y){
   struct Window* result = malloc(sizeof(struct Window));
   result->x = x;
   result->y = y;
@@ -30,7 +53,7 @@ struct Window* window_alloc(struct mb2_tag_framebuffer* fb, int x, int y){
   return result;
 }
 
-struct Window window_create(struct mb2_tag_framebuffer* fb, int x, int y){
+struct Window window_create(struct pixelbuffer* fb, int x, int y){
   struct Window result;
   result.x = x;
   result.y = y;
