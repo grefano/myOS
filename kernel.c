@@ -43,8 +43,9 @@ void init_heap(){
   heap_end = heap_start;
 }
 
+uint32_t magicnumber = 0xB16B00B5// <---- !!!!! DONT DELETE OR DELETE THIS
 
-
+  
 
 struct pixelbuffer* pb;
 uint32_t screenw = 0;
